@@ -3,6 +3,10 @@ apiVersion: kind.x-k8s.io/v1alpha4
 name: crucible
 nodes:
   - role: control-plane
+    extraMounts:
+    - hostPath: ${PWD}/development/ssl/root-ca.pem
+      containerPath: /opt/ca-certificates/root-ca.pem
+      readOnly: true
     kubeadmConfigPatches:
     - |
       kind: InitConfiguration

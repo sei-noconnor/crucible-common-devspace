@@ -1,0 +1,10 @@
+secretGenerator:
+  - name: root-ca
+    files:
+      - ssl/tls.crt
+      - ssl/tls.key
+    type: "kubernetes.io/tls"
+    # namespace: ${DEVSPACE_NAMESPACE}
+
+generatorOptions:
+  disableNameSuffixHash: true
