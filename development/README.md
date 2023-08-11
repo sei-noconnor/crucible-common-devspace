@@ -4,6 +4,7 @@
 - `kind`
 - `yq`
 - `devspace-cli`
+- `openssl`
 
 ### Bootstrap 
 1. `devspace run prep`
@@ -16,4 +17,4 @@ To destroy the cluster and your development environment run
 `devspace run clean`
 
 ## Deveopment 
-run `devspace deploy` to get a working environment with all dependancies. 
+run `devspace run-pipline ordered-deploy` to get a working environment with all dependancies. 
