@@ -6,6 +6,8 @@ pipelines:
   # You can run this pipeline via `devspace deploy` (or `devspace run-pipeline deploy`)
   deploy:
     run: |-
+      generate_ssl $PWD
+      bootstrap_cluster $PWD
       run_dependencies --all                            # 1. Deploy any projects this project needs (see "dependencies")
       ensure_pull_secrets --all                         # 2. Ensure pull secrets
       build_images --all -t $(git describe --always)    # 3. Build, tag (git commit hash) and push all images (see "images")
@@ -17,6 +19,7 @@ pipelines:
       ensure_pull_secrets --all    # 2. Ensure pull secrets
       create_deployments --all     # 3. Deploy Helm charts and manifests specfied as "deployments"
       start_dev app                # 4. Start dev mode "app" (see "dev" section)
+  
   deploy-ordered: |-
     run_dependencies --all
     create_deployments postgres
@@ -26,9 +29,6 @@ pipelines:
     create_deployments keycloak keycloak-inline-config
     create_deployments keycloak-config
   
-  redeploy-keycloak: |-
-    create_deployments keycloak keycloak-inline-config keycloak-config
-
 # This is a list of `deployments` that DevSpace can create for this project
 deployments:
   postgres:
@@ -157,28 +157,14 @@ deployments:
       manifests:
       - development/deps/keycloak/kustomize
 
-  
-  # app:
-  #   # This deployment uses `helm` but you can also define `kubectl` deployments or kustomizations
-  #   helm:
-  #     # We are deploying this project with the Helm chart you provided
-  #     chart:
-  #       name: component-chart
-  #       repo: https://charts.devspace.sh
-  #     # Under `values` we can define the values for this Helm chart used during `helm install/upgrade`
-  #     # You may also use `valuesFiles` to load values from files, e.g. valuesFiles: ["values.yaml"]
-  #     values:
-  #       containers:
-  #         - {}
-
 # This is a list of `dev` containers that are based on the containers created by your deployments
 # dev:
-#   app:
+#   api:
 #     # Replace the container image with this dev-optimized image (allows to skip image building during development)
-#     devImage: ghcr.io/loft-sh/devspace-containers/alpine:3
+#     devImage: mcr.microsoft.com/dotnet/sdk:6.0
 #     # Sync files between the local filesystem and the development container
 #     sync:
-#       - path: ./
+#       - path: ./player-api
 #     # Open a terminal and use the following command to start it
 #     terminal:
 #       command: ./devspace_start.sh
@@ -192,25 +178,6 @@ deployments:
 #       - command: helm
 #       - gitCredentials: true
 
-# # Use the `commands` section to define repeatable dev workflows for this project 
-# commands:
-#   migrate-db:
-#     command: |-
-#       echo 'This is a cross-platform, shared command that can be used to codify any kind of dev task.'
-#       echo 'Anyone using this project can invoke it via "devspace run migrate-db"'
-
-# Define dependencies to other projects with a devspace.yaml
-# dependencies:
-#   api:
-#     git: https://...  # Git-based dependencies
-#     tag: v1.0.0
-#   ui:
-#     path: ./ui        # Path-based dependencies (for monorepos)
-# dependencies:
-#   cert-manager:
-#     path: ./development/deps/cert-manager
-#   postgres:
-#     path: ./development/deps/postgres
 vars:
   DEVSPACE_ENV_FILE: ".env"
 
@@ -221,5 +188,25 @@ commands:
     ./development/scripts/bootstrap.sh $PWD
   clean:
     ./development/scripts/clean.sh $PWD
-  
+
+functions: 
+  generate_ssl: |-
+    dir=$1
+    echo "generate ssl"
+    echo "Working Directory is: $dir"
+    # Create ssl root certificate
+    mkdir -p $dir/development/ssl
+
+    echo "$(openssl version)"
+
+    openssl genrsa -out $dir/development/ssl/tls.key 2048
+    openssl req -x509 -new -nodes -key $dir/development/ssl/tls.key \
+        -days 3650 -sha256 -out $dir/development/ssl/tls.crt -subj "/CN=crucible-ca"
+    cp $dir/development/ssl/tls.crt $dir/development/ssl/root-ca.pem
+  bootstrap_cluster:
+    dir=$1
+    kind_bin=$(which kind)
+    kubectl_bin=$(which kubectl)
+    envsubst < $dir/development/bootstrap-kind-config.yaml | $kind_bin create cluster --config - 
+    $kubectl_bin apply -f $dir/development/deps/ingress-nginx/nginx-ingress.yaml
 
