@@ -21,9 +21,12 @@ pipelines:
     run_dependencies --all
     create_deployments postgres
     create_deployments cert-manager
-    create_deployments tls-ssl
+    create_deployments root-ca
     create_deployments cert-manager-resources
-    create_deployments keycloak
+    create_deployments keycloak keycloak-config
+  
+  redeploy-keycloak: |-
+    create_deployments keycloak keycloak-config
 
 # This is a list of `deployments` that DevSpace can create for this project
 deployments:
@@ -37,7 +40,7 @@ deployments:
         global:
           postgresql:
             auth:
-              postgresPassword: "${ADMIN_PASS}"
+              postgresPassword: "${POSTGRES_PASS}"
   cert-manager:
     helm:
       chart: 
@@ -51,7 +54,7 @@ deployments:
       kustomize: true
       manifests: 
       - development/deps/cert-manager/kustomize
-  tls-ssl:
+  root-ca:
     kubectl:
       kustomize: true
       manifests:
@@ -62,10 +65,12 @@ deployments:
         name: keycloak
         repo: https://charts.bitnami.com/bitnami
         version: 15.1.8
+      valuesFiles:
+        - ./development/deps/keycloak/values/keycloak.values.yaml
       values:
         auth:
           adminUser: admin
-          adminPassword: "$ADMIN_PASS"
+          adminPassword: "${ADMIN_PASS}"
         proxyAddressForwarding: true
         ingress:
           enabled: true
@@ -78,7 +83,7 @@ deployments:
           - name: KEYCLOAK_ADMIN
             value: "admin"
           - name: KEYCLOAK_ADMIN_PASSWORD
-            value: "$ADMIN_PASS"
+            value: "${ADMIN_PASS}"
           - name: KC_HTTP_RELATIVE_PATH
             value: "/keycloak/"
           - name: KC_DB
@@ -86,15 +91,15 @@ deployments:
           - name: KC_DB_USERNAME
             value: "postgres"
           - name: KC_DB_PASSWORD
-            value: "$POSTGRES_PASS"
+            value: "${POSTGRES_PASS}"
           - name: KC_DB_URL_HOST
-            value: "$POSTGRES_SERVER"
+            value: "${POSTGRES_SERVER}"
           - name: KC_DB__URL_PORT
             value: "5432"
           - name: KC_DB_URL_DATABASE
             value: "keycloak"
           - name: KC_HOSTNAME
-            value: $DOMAIN
+            value: ${DOMAIN}
           - name: KC_HOSTNAME_STRICT
             value: "false"
           - name: KC_HOSTNAME_STRICT_HTTPS
@@ -105,22 +110,30 @@ deployments:
             value: /opt/bitnami/keycloak/conf/customreg.yaml
           - name: PROXY_ADDRESS_FORWARDING
             value: "true"
-          # - name: JAVA_OPTS_APPEND
-          #   value: "-Dcom.redhat.fips=false"
           - name: KC_LOG_LEVEL
             value: "org.keycloak.events:DEBUG,org.infinispan:INFO,org.jgroups:INFO"
-          # - name: KC_CACHE
-          #   value: ispn
-          # - name: KC_CACHE_STACK
-          #   value: kubernetes
           - name: KC_METRICS_ENABLED
             value: "true"
           - name: DOMAIN
-            value: $DOMAIN"
+            value: ${DOMAIN}"
           # - name: KC_HTTPS_TRUST_STORE_FILE
           #   value: /opt/bitnami/keycloak/spi-certs/truststore.jks
           # - name: KC_HTTPS_TRUST_STORE_PASSWORD
           #   value: "password"
+        externalDatabase:
+          host: "${POSTGRES_SERVER}"
+          port: 5432
+          user: "${POSTGRES_USER}"
+          database: keycloak
+          password: "${POSTGRES_PASS}"
+          existingSecret: ""
+          existingSecretPasswordKey: ""
+  keycloak-config:
+    kubectl:
+      kustomize: true
+      manifests:
+      - development/deps/keycloak/kustomize
+
   
   # app:
   #   # This deployment uses `helm` but you can also define `kubectl` deployments or kustomizations

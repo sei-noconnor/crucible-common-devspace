@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - keycloak-import.secret.yaml
+secretGenerator:
+  - name: dod-certs
+    files:
+    - ca.crt=files/issuers-dod-certs.crt
+    namespace: ingress-nginx
+
+  - name: keycloak-truststore
+    files:
+    - truststore.jks=files/truststore-sei.jks
+
+  - name: keycloak-import
+    files:
+      - realm.json=files/crucible.json
+      - customreg.yaml=files/crucible.yaml
+
+
+generatorOptions:
+  disableNameSuffixHash: true
