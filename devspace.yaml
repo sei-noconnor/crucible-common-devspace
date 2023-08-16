@@ -203,8 +203,9 @@ functions:
     openssl req -x509 -new -nodes -key $dir/development/ssl/tls.key \
         -days 3650 -sha256 -out $dir/development/ssl/tls.crt -subj "/CN=crucible-ca"
     cp $dir/development/ssl/tls.crt $dir/development/ssl/root-ca.pem
-  bootstrap_cluster:
+  bootstrap_cluster: |-
     dir=$1
+    echo "Working Directory is: $dir"
     kind_bin=$(which kind)
     kubectl_bin=$(which kubectl)
     envsubst < $dir/development/bootstrap-kind-config.yaml | $kind_bin create cluster --config - 
