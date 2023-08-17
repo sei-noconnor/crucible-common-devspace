@@ -17,4 +17,4 @@ To destroy the cluster and your development environment run
 `devspace run clean`
 
 ## Deveopment 
-run `devspace run-pipline ordered-deploy` to get a working environment with all dependancies. 
+run `devspace run-pipline ordered-deploy` to get a working environment with all dependencies. 
