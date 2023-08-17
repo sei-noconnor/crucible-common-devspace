@@ -1,6 +1,7 @@
 ## bootstrap a kubernetes cluster. 
 ### Requirements
-- `Docker Desktop`
+- `kubectl`
+- `Docker Desktop` Docker Engine should suffice
 - `kind`
 - `yq`
 - `devspace-cli`
