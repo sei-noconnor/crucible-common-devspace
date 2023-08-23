@@ -3,7 +3,7 @@ apiVersion: kind.x-k8s.io/v1alpha4
 name: crucible
 nodes:
   - role: control-plane
-    image: kindest/node:v1.25.3
+    image: kindest/node:v1.25.11
     extraMounts:
     - hostPath: ${PWD}/development/ssl/root-ca.pem
       containerPath: /opt/ca-certificates/root-ca.pem

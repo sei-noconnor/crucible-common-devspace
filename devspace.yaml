@@ -82,10 +82,6 @@ deployments:
             cert-manager.io/cluster-issuer: ca-issuer
           tls: true
         extraEnvVars:
-          - name: KEYCLOAK_ADMIN
-            value: "admin"
-          - name: KEYCLOAK_ADMIN_PASSWORD
-            value: "${ADMIN_PASS}"
           - name: KC_HTTP_RELATIVE_PATH
             value: "/keycloak/"
           - name: KC_DB
