@@ -17,5 +17,5 @@ This will bootstrap a kind cluster named `crucible (kind-crucible)` with an ngin
 To destroy the cluster and your development environment run 
 `devspace run clean`
 
-## Deveopment 
-run `devspace run-pipline ordered-deploy` to get a working environment with all dependencies. 
+## Deveopment  
+run `devspace run-pipeline deploy-ordered` to get a working environment with all dependencies. 

@@ -21,6 +21,7 @@ pipelines:
   
   deploy-ordered: |-
     run_dependencies --all
+    create_deployments ingress
     create_deployments postgres
     create_deployments cert-manager
     create_deployments root-ca
@@ -30,6 +31,11 @@ pipelines:
   
 # This is a list of `deployments` that DevSpace can create for this project
 deployments:
+  ingress:
+    kubectl:
+      kustomize: false
+      manifests:
+        - development/deps/ingress-nginx
   postgres:
     helm:
       chart:
@@ -70,9 +76,6 @@ deployments:
       valuesFiles:
         - ./development/deps/keycloak/values/keycloak.values.yaml
       values:
-        auth:
-          adminUser: admin
-          adminPassword: "${ADMIN_PASS}"
         proxyAddressForwarding: true
         ingress:
           enabled: true
@@ -204,7 +207,7 @@ functions:
     kind_bin=$(which kind)
     kubectl_bin=$(which kubectl)
     envsubst < $dir/development/bootstrap-kind-config.yaml | $kind_bin create cluster --config - 
-    $kubectl_bin apply -f $dir/development/deps/ingress-nginx/nginx-ingress.yaml
+    #$kubectl_bin apply -f $dir/development/deps/ingress-nginx/nginx-ingress.yaml
     echo "devspace context: ${DEVSPACE_CONTEXT}"
     sleep 5
 

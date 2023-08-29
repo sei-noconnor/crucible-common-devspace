@@ -244,49 +244,49 @@ args: []
 ##   - name: FOO
 ##     value: "bar"
 ##
-extraEnvVars:
-  - name: KEYCLOAK_ADMIN
-    value: "admin"
-  - name: KEYCLOAK_ADMIN_PASSWORD
-    value: "${ADMIN_PASS}"
-  - name: KC_HTTP_RELATIVE_PATH
-    value: "/keycloak/"
-  - name: KC_DB
-    value: "postgres"
-  - name: KC_DB_USERNAME
-    value: "postgres"
-  - name: KC_DB_PASSWORD
-    value: "${POSTGRES_PASS}"
-  - name: KC_DB_URL_HOST
-    value: "${POSTGRES_SERVER}"
-  - name: KC_DB__URL_PORT
-    value: "5432"
-  - name: KC_DB_URL_DATABASE
-    value: "keycloak"
-  - name: KC_HOSTNAME
-    value: ${DOMAIN}
-  - name: KC_HOSTNAME_STRICT
-    value: "false"
-  - name: KC_HOSTNAME_STRICT_HTTPS
-    value: "false"
-  - name: KC_HTTPS_CLIENT_AUTH
-    value: "request"
-  - name: CUSTOM_REGISTRATION_CONFIG
-    value: /opt/bitnami/keycloak/conf/customreg.yaml
-  - name: PROXY_ADDRESS_FORWARDING
-    value: "true"
+# extraEnvVars:
+#   - name: KEYCLOAK_ADMIN
+#     value: "admin"
+#   - name: KEYCLOAK_ADMIN_PASSWORD
+#     value: "${ADMIN_PASS}"
+#   - name: KC_HTTP_RELATIVE_PATH
+#     value: "/keycloak/"
+#   - name: KC_DB
+#     value: "postgres"
+#   - name: KC_DB_USERNAME
+#     value: "postgres"
+#   - name: KC_DB_PASSWORD
+#     value: "${POSTGRES_PASS}"
+#   - name: KC_DB_URL_HOST
+#     value: "${POSTGRES_SERVER}"
+#   - name: KC_DB__URL_PORT
+#     value: "5432"
+#   - name: KC_DB_URL_DATABASE
+#     value: "keycloak"
+#   - name: KC_HOSTNAME
+#     value: ${DOMAIN}
+#   - name: KC_HOSTNAME_STRICT
+#     value: "false"
+#   - name: KC_HOSTNAME_STRICT_HTTPS
+#     value: "false"
+#   - name: KC_HTTPS_CLIENT_AUTH
+#     value: "request"
+#   - name: CUSTOM_REGISTRATION_CONFIG
+#     value: /opt/bitnami/keycloak/conf/customreg.yaml
+#   - name: PROXY_ADDRESS_FORWARDING
+#     value: "true"
   # - name: JAVA_OPTS_APPEND
   #   value: "-Dcom.redhat.fips=false"
-  - name: KC_LOG_LEVEL
-    value: "org.keycloak.events:DEBUG,org.infinispan:INFO,org.jgroups:INFO"
+  # - name: KC_LOG_LEVEL
+  #   value: "org.keycloak.events:DEBUG,org.infinispan:INFO,org.jgroups:INFO"
   # - name: KC_CACHE
   #   value: ispn
   # - name: KC_CACHE_STACK
   #   value: kubernetes
-  - name: KC_METRICS_ENABLED
-    value: "true"
-  - name: DOMAIN
-    value: ${DOMAIN}"
+  # - name: KC_METRICS_ENABLED
+  #   value: "true"
+  # - name: DOMAIN
+  #   value: ${DOMAIN}"
   # - name: KC_HTTPS_TRUST_STORE_FILE
   #   value: /opt/bitnami/keycloak/spi-certs/truststore.jks
   # - name: KC_HTTPS_TRUST_STORE_PASSWORD
