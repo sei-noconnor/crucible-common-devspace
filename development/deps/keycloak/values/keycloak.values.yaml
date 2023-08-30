@@ -500,12 +500,6 @@ extraVolumes: |-
       items:
       - key: realm.json
         path: realm.json
-  # - name: truststore
-  #   secret:
-  #     secretName: keycloak-truststore
-  #     items:
-  #     - key: truststore.jks
-  #       path: truststore.jks
   - name: plugin
     emptyDir: {}
   - name: quarkusproperties
@@ -526,9 +520,6 @@ extraVolumeMounts: |-
   - name: realm
     mountPath: /opt/bitnami/keycloak/data/import/realm.json
     subPath: realm.json
-  # - name: truststore
-  #   mountPath: /opt/bitnami/keycloak/spi-certs/truststore.jks
-  #   subPath: truststore.jks
   - name: plugin
     mountPath: /opt/bitnami/keycloak/providers/p1-keycloak-plugin.jar
     subPath: p1-keycloak-plugin.jar

@@ -28,6 +28,13 @@ pipelines:
     create_deployments cert-manager-resources
     create_deployments keycloak keycloak-inline-config
     create_deployments keycloak-config
+
+  prep: |-
+    generate_ssl $PWD
+  bootstrap: |-
+    bootstrap_cluster $PWD
+  clean: |-
+    clean_cluster $PWD
   
 # This is a list of `deployments` that DevSpace can create for this project
 deployments:
@@ -185,33 +192,50 @@ vars:
 
 commands:
   prep:
-    ./development/scripts/prep.sh $PWD
+    devspace run-pipeline prep
   bootstrap:
-    ./development/scripts/bootstrap.sh $PWD
+    devspace run-pipeline bootstrap
   clean:
-    ./development/scripts/clean.sh $PWD
-
+    devspace run-pipeline clean
+  
 functions: 
   generate_ssl: |-
     dir=$1
     echo "generate ssl"
     echo "Working Directory is: $dir"
     # Create ssl root certificate
-    mkdir -p $dir/development/ssl
+    if [ ! -d $dir/development/ssl ]; then 
+      mkdir -p $dir/development/ssl
 
-    echo "$(openssl version)"
+      echo "$(openssl version)"
 
-    openssl genrsa -out $dir/development/ssl/tls.key 2048
-    openssl req -x509 -new -nodes -key $dir/development/ssl/tls.key \
-        -days 3650 -sha256 -out $dir/development/ssl/tls.crt -subj "/CN=crucible-ca"
-    cp $dir/development/ssl/tls.crt $dir/development/ssl/root-ca.pem
+      openssl genrsa -out $dir/development/ssl/tls.key 2048
+      openssl req -x509 -new -nodes -key $dir/development/ssl/tls.key \
+          -days 3650 -sha256 -out $dir/development/ssl/tls.crt -subj "/CN=crucible-ca"
+      cp $dir/development/ssl/tls.crt $dir/development/ssl/root-ca.pem
+    else 
+      echo "ssl folder exists not recreating"
+    fi
+    # If using this repo as a dependency copy the SSL cert to dependency root
+    
+    if [ -n "${DEVSPACE_WORKING_DIR}" ]; then
+      echo "copying SSL files to ${DEVSPACE_WORKING_DIR}"
+      cp -r $dir/development/ssl/ ${DEVSPACE_WORKING_DIR}/ssl
+    fi
   bootstrap_cluster: |-
     dir=$1
     echo "Working Directory is: $dir"
     kind_bin=$(which kind)
     kubectl_bin=$(which kubectl)
     envsubst < $dir/development/bootstrap-kind-config.yaml | $kind_bin create cluster --config - 
-    #$kubectl_bin apply -f $dir/development/deps/ingress-nginx/nginx-ingress.yaml
     echo "devspace context: ${DEVSPACE_CONTEXT}"
-    sleep 5
+    sleep 10
+  clean_cluster: |-
+    echo "Clean Script"
+    dir=$1
+    kind_bin=$(which kind)
+    kubectl_bin=$(which kubectl)
+    $kind_bin delete cluster -n $(yq '.name' < $dir/development/bootstrap-kind-config.yaml)
+  
+  
 
