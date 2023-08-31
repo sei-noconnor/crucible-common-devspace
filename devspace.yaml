@@ -127,10 +127,7 @@ deployments:
             value: "true"
           - name: DOMAIN
             value: ${DOMAIN}
-          # - name: KC_HTTPS_TRUST_STORE_FILE
-          #   value: /opt/bitnami/keycloak/spi-certs/truststore.jks
-          # - name: KC_HTTPS_TRUST_STORE_PASSWORD
-          #   value: "password"
+          
         externalDatabase:
           host: "${POSTGRES_SERVER}"
           port: 5432
@@ -165,27 +162,6 @@ deployments:
       kustomize: true
       manifests:
       - development/deps/keycloak/kustomize
-
-# This is a list of `dev` containers that are based on the containers created by your deployments
-# dev:
-#   api:
-#     # Replace the container image with this dev-optimized image (allows to skip image building during development)
-#     devImage: mcr.microsoft.com/dotnet/sdk:6.0
-#     # Sync files between the local filesystem and the development container
-#     sync:
-#       - path: ./player-api
-#     # Open a terminal and use the following command to start it
-#     terminal:
-#       command: ./devspace_start.sh
-#     # Inject a lightweight SSH server into the container (so your IDE can connect to the remote dev env)
-#     ssh:
-#       enabled: true
-#     # Make the following commands from my local machine available inside the dev container
-#     proxyCommands:
-#       - command: devspace
-#       - command: kubectl
-#       - command: helm
-#       - gitCredentials: true
 
 vars:
   DEVSPACE_ENV_FILE: ".env"
