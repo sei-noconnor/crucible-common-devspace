@@ -8,7 +8,7 @@ secretGenerator:
 
   - name: keycloak-truststore
     files:
-    - truststore.jks=files/truststore-sei.jks
+    - truststore.jks=files/truststore.jks
 
   - name: keycloak-import
     files:
